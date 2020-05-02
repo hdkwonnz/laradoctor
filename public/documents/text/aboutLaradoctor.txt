@@ -1,0 +1,95 @@
+- larapizza 따라하기를 참조할 것. => https://www.youtube.com/watch?v=pjK0VMTCtVg
+
+  server side vue validation setup
+    https://www.youtube.com/watch?v=Iq4qGVkFNdo (현재는 DoctorsSchedule.vue에 있음)
+    해당  controller에서 $this->validate($request, [
+            			'selectedDate' => 'required',
+            			'doctorId' => 'required'
+       			 ]);
+    나머지는 vue에서 coding. => laradoctor => DoctorsSchedule.vue에 있음
+
+  progressBar =>
+    https://www.youtube.com/watch?v=-Hl4A5cMH_I&list=PLB4AdipoHpxaHDLIaMdtro1eXnQtl_UvE&index=17
+    https://github.com/hilongjw/vue-progressbar
+    yarn add vue-progressbar
+    resources/js/app.js => import VueProgressBar from 'vue-progressbar'
+		     Vue.use(VueProgressBar, {
+		          color: 'green',
+	 	          failedColor: 'red',
+	                            height: '3px'
+		    })
+    resources/views/layouts/app.blade.php =>
+                          <vue-progress-bar></vue-progress-bar>
+    resources/js/components/appointment/DoctorsSchedule.vue => showDoctors() =>
+	this.$Progress.start();
+	this.$Progress.finish();
+
+  db table 용도에 따라 soft delete를 사용.
+
+  vue js 사용  => www.youtube.com/watch?v=An3xG7HzSXE&list=PLB4AdipoHpxZcaRs8RWpoywYf_JotqZnz
+                          www.youtube.com/watch?v=lzhnOgwto0M
+
+  spatie ACL 사용 => https://www.youtube.com/watch?v=zIgYJlu03bI
+                                 https://github.com/spatie/laravel-permission#laravel
+                                 https://docs.spatie.be/laravel-permission/v3/introduction/
+
+  pusher를 사용 하여 alert message를 보낸다
+    pusher.com을 사용하지 않고 websocket을 사용 하나 application code는 동일 하다.
+    *****반드시 php artisan queue:work --tries=2 --sleep=3  를 run 할 것.*****
+    *****반드시 php artisan websockets:serve 를 run 할 live server 에서는 superviser 등록 할 것*****
+
+  websocket 사용하기
+    [https://www.youtube.com/watch?v=H_4UubWE9NQ]
+    [https://docs.beyondco.de/laravel-websockets/]
+    [https://docs.beyondco.de/laravel-websockets/1.0/getting-started/installation.html]
+    기본 적으로 pusher.com을 사용 할때와 application code는 동일.
+    단지 .env, config file 등을 수정하면 phuser.com 사용과 동일
+    .env => BROADCAST_DRIVER=pusher
+    ******반드시 php artisan queue:work --tries=2 --sleep=3  를 run 할 것.*****
+    ******반드시 php artisan websockets:serve 를 run 할 것(07/Feb/2020 추가)****
+
+  queue 위하여 beanstalkd 사용
+    [https://www.vultr.com/docs/managing-laravel-work-queues-with-beanstalk-and-supervisor-on-ubuntu-16-04]
+    [https://vannstudios.com/sending-emails-using-laravel-queues-and-beanstalkd]
+    **laradoctor에는 이미 queue를 사용하기 위한 appplication code가 준비 되어 있어 있어 아래의 composer 등록 만으로 run 할 수 있다.
+    live server에는 별도로 install 해야 한다(supervisord에 등록 하고 사용할 것 => 02/Feb/2020 추가).
+    .env => QUEUE_CONNECTION=beanstalkd
+    ubuntu => cd Code/laradoctor/laradoctor => composer require pda/pheanstalk ~4.0
+    ******반드시 php artisan queue:work --tries=2 --sleep=3  를 run 할 것.(07/Feb/2020 추가)*****
+
+  cache driver로  redis 사용
+     [https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-redis-on-ubuntu-18-04]
+     [https://tecadmin.net/install-redis-ubuntu/]
+     [https://linux4one.com/how-to-install-redis-on-ubuntu-18-04/]
+     laravel.com(Redis 로 search 할것) 참조 할 것.
+     live server에는 별도로 install 해야 한다.
+     ubuntu => cd/Code/laradoctor/laradoctor
+     composer require predis/predis
+     .env modify
+     example source code => laradoctor.test/appointment/timeTable
+     ubuntu=> cd Code/laradoctor/laradoctor/ => composer require predis/predis => install
+     .env => CACHE_DRIVER=redis
+
+  pagination  사용
+    [https://www.youtube.com/watch?v=zMk52OlK2Aw&list=PLB4AdipoHpxaHDLIaMdtro1eXnQtl_UvE&index=48]
+    [https://github.com/gilbitron/laravel-vue-pagination]
+    AppointmentController/showAppointmentByDate() 참조
+    vue(AppointmentDate.vue) 참조
+
+  - homestead application 다른 컴퓨터에서 연결 하기***********매우 중요*******************************************************
+  (How to access laravel from another computer | Laravel Homestead)
+  https://www.youtube.com/watch?v=1nGckFKPMT4
+    windows command line 에서 ipconfig type 하여
+    Wireless Lan adapter Wi-Fi 안에 IPv4 Address(예:192.168.1.65) 를 Homestead.yaml 과 hosts file에 추가
+    Homestead.yaml 수정 ==> 아래 예제
+    - map: laradoctor.test
+        to: /home/vagrant/Code/laradoctor/laradoctor/public
+    *****아래 두줄을 추가 하 였음************
+    - map: laradoctor.test.192.168.1.65.xip.io
+       to: /home/vagrant/Code/laradoctor/laradoctor/public
+    vagrant reload --provision
+    C:\Windows\System32\drivers\etc\hosts file에 등록   ==> 아래예제
+    127.0.0.1 laradoctor.test.192.168.1.65.xip.io ==> 추가 하였다.
+    Chrome browser(mobile, pc) 에서 laradoctor.test.192.168.1.65.xip.io:8000
+
+
